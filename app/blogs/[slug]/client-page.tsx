@@ -74,11 +74,54 @@ export default function BlogClientPage({ blog, relatedBlogs }: { blog: PrismicBl
                     </div>
                 </div>
 
-                {/* Blog Content */}
-                <div className="prose lg:prose-lg max-w-none text-gray-700 leading-relaxed">
+                               {/* Blog Content */}
+                    <div className="prose lg:prose-lg max-w-none text-gray-700 leading-relaxed">
                     {/* This component renders Prismic's Rich Text field */}
-                    <PrismicRichText field={blog.data.content} />
+                    {/* <PrismicRichText field={blog.data.content} /> */}
+
+                    {/* Render Prismic 'contents' blocks (paragraphs, images, headings) */}
+                    <div className="mt-8 space-y-6">
+                        {(blog.data.contents || []).map((block: any, idx: number) => {
+                            // Paragraph
+                            if (block.type === 'paragraph') {
+                                return (
+                                    <p key={idx} className="text-base text-gray-700">
+                                        {block.text}
+                                    </p>
+                                );
+                            }
+
+                            if (block.type === 'heading1') return <h1 key={idx} className="text-2xl font-bold">{block.text}</h1>;
+                            if (block.type === 'heading2') return <h2 key={idx} className="text-xl font-semibold">{block.text}</h2>;
+                            if (block.type === 'heading3') return <h3 key={idx} className="text-lg font-semibold">{block.text}</h3>;
+
+                            if (block.type === 'image') {
+                                const url = block.url || block.image?.url || block?.dimensions ? block.url : '';
+                                const alt = block.alt || block.image?.alt || '';
+                                return (
+                                    <div key={idx} className="relative w-full h-64 md:h-96 rounded-xl overflow-hidden shadow-md">
+                                        {url ? (
+                                            <Image src={url} alt={alt} fill className="object-cover" />
+                                        ) : null}
+                                    </div>
+                                );
+                            }
+
+                            
+                            if (block.text) {
+                                return (
+                                    <p key={idx} className="text-base text-gray-700">
+                                        {block.text}
+                                    </p>
+                                );
+                            }
+
+                            return null;
+                        })}
+                    </div>
+
                 </div>
+
 
                 {/* FAQ Section */}
                 {blog.data.faq && blog.data.faq.length > 0 && (
